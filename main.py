@@ -1,6 +1,7 @@
-
+from tokens import TOKEN, TOKEN_YA
 import requests
 from tqdm import tqdm
+
 
 class VKAPI:
     API_BASE_URL = 'https://api.vk.com/method/'
@@ -42,6 +43,7 @@ class VKAPI:
             info.append({'url': size_photo, 'like': like_photo, 'type': type_photo, 'date': date_publish})
         return info
 
+
 class YAdisk:
 
     def __init__(self, token):
@@ -78,6 +80,7 @@ class YAdisk:
             # name_files.append(i['name'])
             name_files += i['name']
         return
+
     def check_name(self, photo):
         for name in self.get_files():
             print(name['name'])
@@ -114,7 +117,6 @@ class YAdisk:
         #     return r.json()
 
 
-
 # id_client = input('Введите id от необходимого аккаунта VK:\n')
 # token_vk = input('Введите  от необходимого аккаунта VK:\n')
 
@@ -137,5 +139,5 @@ if __name__ == '__main__':
         # #     # type = photo['type']
         #     ya.upload(photo)
 
-    push_photo()
 
+    push_photo()
