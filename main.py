@@ -1,6 +1,5 @@
 import datetime
 import json
-from pprint import pprint
 
 from tokens import TOKEN, TOKEN_YA
 import requests
@@ -63,48 +62,50 @@ class YADISK:
             name_list.append(i['name'])
         return name_list
 
-    def export_to_json(self,):
-        with open('files/log.json', 'w', encoding='utf-8') as file:
-            # json.dump(log_json, file)
-            pprint(self.__get_files())
-
     def upload(self, photo):
         self.__mkdir()
         url = self.base_url + 'upload?'
         list_name = self.__get_files()
-        log_json = []
         if f"{photo['like']}" in list_name:
             date = f"{datetime.datetime.fromtimestamp(photo['date']).year}." \
                    f"{datetime.datetime.fromtimestamp(photo['date']).month}." \
                    f"{datetime.datetime.fromtimestamp(photo['date']).day}"
             params = {
-                'path': self.folder + '/' + date,
+                'path': self.folder + f"/{photo['like']}-{date}",
                 'url': photo['url'],
             }
-            r = requests.post(url=url, headers=self.headers, params=params)
-            log_json.append({'file_name': f"{date}.jpg", 'size': {photo['type']}})
-            return r.json()
+            requests.post(url=url, headers=self.headers, params=params)
+            return {'file_name': f"{photo['like']}-{date}.jpg", 'size': f"{photo['type']}"}
+
         else:
             params = {
                 'path': self.folder + '/' + str(photo['like']),
                 'url': photo['url'],
             }
-            r = requests.post(url=url, headers=self.headers, params=params)
-            log_json.append({'file_name': f"{photo['like']}.jpg", 'size': {photo['type']}})
-            return r.json()
+            requests.post(url=url, headers=self.headers, params=params)
+            return {'file_name': f"{photo['like']}.jpg", 'size': f"{photo['type']}"}
 
 
 # id_client = input('Введите id от необходимого аккаунта VK:\n')
 # token_vk = input('Введите  от необходимого аккаунта VK:\n')
 
 if __name__ == '__main__':
+    def export_to_json(log_file):
+        with open('files/log.json', 'a', encoding='utf-8') as file:
+            json.dump(log_file, file)
+
+
     def backup_photo():
         ya = YADISK(TOKEN_YA)
         vk_client = VKAPI(TOKEN, 22769715)
         photos = vk_client.get_photo()
+        log_file = []
         for photo in tqdm(photos):
-            ya.upload(photo)
-            ya.export_to_json()
+            log_file.append(ya.upload(photo))
+        export_to_json(log_file)
+
+        print(
+            'Выгрузка фотографий на YAdisk заканчана, url для просмотра фото https://disk.yandex.ru/client/disk/photos_vk ')
 
 
     backup_photo()
